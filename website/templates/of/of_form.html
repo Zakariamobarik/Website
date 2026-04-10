@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ titre }} - Suivi Production{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- En-tête -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="display-6">
+                <i class="fas fa-file-alt"></i> {{ titre }}
+            </h1>
+        </div>
+    </div>
+
+    <!-- Formulaire -->
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">{{ titre }}</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST" novalidate>
+                        {% csrf_token %}
+                        
+                        <!-- Champ Numéro -->
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <i class="fas fa-barcode"></i> Numéro OF
+                            </label>
+                            {% if form.numero.errors %}
+                                <input type="text" name="numero" class="form-control is-invalid" 
+                                       value="{{ form.numero.value|default:'' }}" required>
+                                <div class="invalid-feedback">
+                                    {{ form.numero.errors.0 }}
+                                </div>
+                            {% else %}
+                                <input type="text" name="numero" class="form-control" 
+                                       placeholder="Ex: OF-001" 
+                                       value="{{ form.numero.value|default:'' }}" required>
+                            {% endif %}
+                            <small class="text-muted">Identifiant unique de l'OF</small>
+                        </div>
+
+                        <!-- Champ Produit -->
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <i class="fas fa-box"></i> Produit
+                            </label>
+                            {% if form.produit.errors %}
+                                <input type="text" name="produit" class="form-control is-invalid" 
+                                       value="{{ form.produit.value|default:'' }}" required>
+                                <div class="invalid-feedback">
+                                    {{ form.produit.errors.0 }}
+                                </div>
+                            {% else %}
+                                <input type="text" name="produit" class="form-control" 
+                                       placeholder="Ex: Strapontin modèle X" 
+                                       value="{{ form.produit.value|default:'' }}" required>
+                            {% endif %}
+                            <small class="text-muted">Nom du produit à fabriquer</small>
+                        </div>
+
+                        <!-- Champ Quantité -->
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <i class="fas fa-cube"></i> Quantité
+                            </label>
+                            {% if form.quantite.errors %}
+                                <input type="number" name="quantite" class="form-control is-invalid" 
+                                       value="{{ form.quantite.value|default:1 }}" min="1" required>
+                                <div class="invalid-feedback">
+                                    {{ form.quantite.errors.0 }}
+                                </div>
+                            {% else %}
+                                <input type="number" name="quantite" class="form-control" 
+                                       placeholder="Ex: 10" 
+                                       value="{{ form.quantite.value|default:1 }}" min="1" required>
+                            {% endif %}
+                            <small class="text-muted">Nombre de pièces à produire</small>
+                        </div>
+
+                        <hr>
+
+                        <!-- Boutons d'action -->
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="fas fa-save"></i> 
+                                {% if of %}Mettre à jour{% else %}Créer l'OF{% endif %}
+                            </button>
+                            <a href="{% url 'of_list' %}" class="btn btn-secondary btn-lg">
+                                <i class="fas fa-times"></i> Annuler
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Aide à droite -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm bg-light">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-info-circle"></i> Information
+                    </h5>
+                    <ul class="small">
+                        <li><strong>Numéro :</strong> Code unique (ex: OF-001)</li>
+                        <li><strong>Produit :</strong> Nom du strapontin</li>
+                        <li><strong>Quantité :</strong> Pièces à fabriquer</li>
+                    </ul>
+                    
+                    {% if of %}
+                    <hr>
+                    <div class="alert alert-info">
+                        <h6>Information OF</h6>
+                        <p class="small mb-0">
+                            <strong>ID :</strong> {{ of.id }}<br>
+                            <strong>Numéro :</strong> {{ of.numero }}<br>
+                            <strong>Avancement :</strong> {{ of.avancement }}%
+                        </p>
+                    </div>
+                    {% else %}
+                    <hr>
+                    <div class="alert alert-success">
+                        <h6>🔥 Nouveau OF</h6>
+                        <p class="small mb-0">
+                            Quand vous créerez cet OF,<br>
+                            <strong>6 opérations seront créées automatiquement !</strong>
+                        </p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

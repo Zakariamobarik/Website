@@ -1,62 +1,256 @@
 {% extends 'base.html' %}
+{% block title %}Accueil - Suivi Production{% endblock %}
 
 {% block content %}
+<div class="container-fluid">
+    <!-- ===== HERO SECTION ===== -->
+    {% if not user.is_authenticated %}
+    <div class="hero-section" style="
+        background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+        color: white;
+        padding: 100px 30px;
+        border-radius: 15px;
+        text-align: center;
+        margin-bottom: 50px;
+    ">
+        <h1 style="font-size: 3.5rem; font-weight: 700; margin-bottom: 20px;">
+            <i class="fas fa-industry"></i> DCRM Production
+        </h1>
+        <p style="font-size: 1.2rem; margin-bottom: 30px; opacity: 0.95;">
+            Suivi en temps réel de votre production - Optimisez vos flux de travail
+        </p>
+        <div class="d-flex gap-3 justify-content-center">
+            <a href="{% url 'register' %}" class="btn btn-light btn-lg" style="
+                background: white;
+                color: #3498db;
+                font-weight: 600;
+                border-radius: 8px;
+                padding: 12px 40px;
+            ">
+                📝 S'inscrire
+            </a>
+            <button class="btn btn-outline-light btn-lg" style="
+                border: 2px solid white;
+                border-radius: 8px;
+                padding: 12px 40px;
+            " data-bs-toggle="modal" data-bs-target="#loginModal">
+                🔐 Se connecter
+            </button>
+        </div>
+    </div>
+    {% else %}
+    <!-- ===== WELCOME SECTION (Utilisateur connecté) ===== -->
+    <div class="topbar">
+        <div class="topbar-title">
+            <h2>👋 Bienvenue, {{ user.first_name|default:user.username }}!</h2>
+            <p>{{ now|date:"d F Y" }} - Bonne production!</p>
+        </div>
+    </div>
+    {% endif %}
 
+    <!-- ===== FEATURES SECTION ===== -->
+    {% if not user.is_authenticated %}
+    <h2 style="text-align: center; margin-bottom: 50px; font-weight: 700;">
+        ✨ Fonctionnalités principales
+    </h2>
+    <div class="row g-4 mb-5">
+        <!-- Feature 1 -->
+        <div class="col-md-4">
+            <div class="card h-100" style="border-top: 4px solid #3498db;">
+                <div class="card-body text-center">
+                    <div style="
+                        font-size: 50px;
+                        margin-bottom: 15px;
+                    ">📱</div>
+                    <h5 class="card-title">Pointage par Code-barres</h5>
+                    <p class="card-text">
+                        Scan rapide et intuitif avec identification automatique des opérateurs et des OF
+                    </p>
+                </div>
+            </div>
+        </div>
 
+        <!-- Feature 2 -->
+        <div class="col-md-4">
+            <div class="card h-100" style="border-top: 4px solid #27ae60;">
+                <div class="card-body text-center">
+                    <div style="
+                        font-size: 50px;
+                        margin-bottom: 15px;
+                    ">📊</div>
+                    <h5 class="card-title">Dashboard Temps Réel</h5>
+                    <p class="card-text">
+                        Visualisez tous vos OF en cours, en retard ou terminés en un coup d'œil
+                    </p>
+                </div>
+            </div>
+        </div>
 
-{% if user.is_authenticated %}
+        <!-- Feature 3 -->
+        <div class="col-md-4">
+            <div class="card h-100" style="border-top: 4px solid #e74c3c;">
+                <div class="card-body text-center">
+                    <div style="
+                        font-size: 50px;
+                        margin-bottom: 15px;
+                    ">📈</div>
+                    <h5 class="card-title">Timeline Détaillée</h5>
+                    <p class="card-text">
+                        Suivez chaque opération avec historique complet et détection des anomalies
+                    </p>
+                </div>
+            </div>
+        </div>
 
+        <!-- Feature 4 -->
+        <div class="col-md-4">
+            <div class="card h-100" style="border-top: 4px solid #f39c12;">
+                <div class="card-body text-center">
+                    <div style="
+                        font-size: 50px;
+                        margin-bottom: 15px;
+                    ">⚠️</div>
+                    <h5 class="card-title">Gestion des Aléas</h5>
+                    <p class="card-text">
+                        Déclaration et suivi des incidents, pannes et perturbations
+                    </p>
+                </div>
+            </div>
+        </div>
 
-<table class="table table-striped table-hover table-bordered">
-  <thead class="table-dark">
-    <tr>
-      <th scope="col">Name</th>
-      <th scope="col">Email</th>
-      <th scope="col">Phone</th>
-      <th scope="col">Address</th>
-      <th scope="col">City</th>
-      <th scope="col">State</th>
-      <th scope="col">Zipcode</th>
-      <th scope="col">Created At</th>
-      <th scope="col">ID</th>
-    </tr>
-  </thead>
-  <tbody>
-    
+        <!-- Feature 5 -->
+        <div class="col-md-4">
+            <div class="card h-100" style="border-top: 4px solid #9b59b6;">
+                <div class="card-body text-center">
+                    <div style="
+                        font-size: 50px;
+                        margin-bottom: 15px;
+                    ">🎯</div>
+                    <h5 class="card-title">Performance & Gamme</h5>
+                    <p class="card-text">
+                        Comparaison des temps réels vs temps alloué pour chaque opération
+                    </p>
+                </div>
+            </div>
+        </div>
 
+        <!-- Feature 6 -->
+        <div class="col-md-4">
+            <div class="card h-100" style="border-top: 4px solid #1abc9c;">
+                <div class="card-body text-center">
+                    <div style="
+                        font-size: 50px;
+                        margin-bottom: 15px;
+                    ">📝</div>
+                    <h5 class="card-title">Rapports & Historique</h5>
+                    <p class="card-text">
+                        Génération facile d'historiques et d'analyses de production
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <!-- ===== BENEFITS SECTION ===== -->
+    <h2 style="text-align: center; margin: 80px 0 50px; font-weight: 700;">
+        🚀 Avantages de DCRM Pro
+    </h2>
+    <div class="row g-4 mb-5">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">
+                        ✅ Optimisation de la Production
+                    </h5>
+                    <ul style="list-style: none; padding: 0;">
+                        <li><i class="fas fa-check" style="color: #27ae60; margin-right: 10px;"></i> Réduction des temps d'arrêt</li>
+                        <li><i class="fas fa-check" style="color: #27ae60; margin-right: 10px;"></i> Suivi des aléas en temps réel</li>
+                        <li><i class="fas fa-check" style="color: #27ae60; margin-right: 10px;"></i> Identification des goulots</li>
+                        <li><i class="fas fa-check" style="color: #27ae60; margin-right: 10px;"></i> Analyse des performances</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">
+                        ⚡ Flexibilité & Évolutivité
+                    </h5>
+                    <ul style="list-style: none; padding: 0;">
+                        <li><i class="fas fa-check" style="color: #27ae60; margin-right: 10px;"></i> Solution cloud-ready</li>
+                        <li><i class="fas fa-check" style="color: #27ae60; margin-right: 10px;"></i> Interface intuitive</li>
+                        <li><i class="fas fa-check" style="color: #27ae60; margin-right: 10px;"></i> Multi-utilisateurs</li>
+                        <li><i class="fas fa-check" style="color: #27ae60; margin-right: 10px;"></i> Support technique</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
 
-	
-	  </tbody>
-	</table>
+    <!-- ===== CTA SECTION ===== -->
+    <div style="
+        background: linear-gradient(135deg, #3498db 0%, #2c3e50 100%);
+        color: white;
+        padding: 60px 30px;
+        border-radius: 15px;
+        text-align: center;
+        margin-bottom: 50px;
+    ">
+        <h2 style="font-weight: 700; margin-bottom: 20px;">Prêt à démarrer?</h2>
+        <p style="font-size: 1.1rem; margin-bottom: 30px;">
+            Inscrivez-vous maintenant et optimisez votre production dès aujourd'hui!
+        </p>
+        <a href="{% url 'register' %}" class="btn btn-light btn-lg" style="
+            color: #3498db;
+            font-weight: 600;
+            border-radius: 8px;
+            padding: 12px 40px;
+        ">
+            Créer un compte gratuitement
+        </a>
+    </div>
+    {% endif %}
 
+    <!-- Messages d'alerte -->
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    {% endif %}
+</div>
 
-
-
-
-{% else %}
-
-<div class="col-md-6 offset-md-3">
-<h1>Login</h1>
-<br/>
-
-<form method="POST" action="{% url 'home' %}">
-	{% csrf_token %}
-
-  <div class="mb-3">
-    <input type="text" class="form-control" name="username", placeholder="Username" required>
-    
-  </div><br/>
-  <div class="mb-3">
-    <input type="password" class="form-control" name="password", placeholder="Password" required>
-  </div>
-  <br/>
-  <button type="submit" class="btn btn-secondary">Login</button>
-
-</form>
-
-
-
-{% endif %}
+<!-- ===== MODAL LOGIN ===== -->
+<div class="modal fade" id="loginModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title">🔐 Connexion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="{% url 'home' %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-user"></i> Nom d'utilisateur</label>
+                        <input type="text" class="form-control" name="username" placeholder="Votre nom d'utilisateur" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-lock"></i> Mot de passe</label>
+                        <input type="password" class="form-control" name="password" placeholder="Votre mot de passe" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Se connecter</button>
+                </form>
+                <hr>
+                <p class="text-center text-muted">
+                    Pas encore inscrit? <a href="{% url 'register' %}">Créer un compte</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
 
 {% endblock %}

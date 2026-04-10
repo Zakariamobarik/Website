@@ -1,0 +1,416 @@
+/* 
+   Styles personnalisés pour DCRM Pro
+   Complément aux styles inlines du base.html
+   Utilisez ce fichier pour les styles réutilisables
+*/
+
+/* ===== VARIABLES PERSONNALISÉES ===== */
+:root {
+    --primary-color: #2c3e50;
+    --secondary-color: #3498db;
+    --accent-color: #e74c3c;
+    --success-color: #27ae60;
+    --warning-color: #f39c12;
+    --danger-color: #c0392b;
+    --light-bg: #ecf0f1;
+    --text-dark: #2c3e50;
+    --text-light: #7f8c8d;
+    --border-color: #bdc3c7;
+    --shadow-sm: 0 2px 5px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 5px 15px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.2);
+    --transition: all 0.3s ease;
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ===== SCROLLBAR PERSONNALISÉE ===== */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* ===== COMPOSANTS RÉUTILISABLES ===== */
+
+/* Cartes avec animation au survol */
+.card-hover {
+    transition: var(--transition);
+    cursor: pointer;
+}
+
+.card-hover:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Badges personnalisés */
+.badge-custom {
+    padding: 8px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.badge-custom.success {
+    background: linear-gradient(135deg, var(--success-color), #229954);
+    color: white;
+}
+
+.badge-custom.danger {
+    background: linear-gradient(135deg, var(--accent-color), var(--danger-color));
+    color: white;
+}
+
+.badge-custom.warning {
+    background: linear-gradient(135deg, var(--warning-color), #e67e22);
+    color: white;
+}
+
+.badge-custom.info {
+    background: linear-gradient(135deg, var(--secondary-color), #2980b9);
+    color: white;
+}
+
+/* Boutons avec effectes */
+.btn-custom {
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-weight: 600;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-custom::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.2);
+    transition: left 0.3s ease;
+    z-index: -1;
+}
+
+.btn-custom:hover::before {
+    left: 100%;
+}
+
+.btn-custom.primary {
+    background: var(--secondary-color);
+    color: white;
+}
+
+.btn-custom.primary:hover {
+    background: #2980b9;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+}
+
+.btn-custom.success {
+    background: var(--success-color);
+    color: white;
+}
+
+.btn-custom.success:hover {
+    background: #229954;
+    transform: translateY(-2px);
+}
+
+.btn-custom.danger {
+    background: var(--accent-color);
+    color: white;
+}
+
+.btn-custom.danger:hover {
+    background: var(--danger-color);
+    transform: translateY(-2px);
+}
+
+/* Progress bar personnalisée */
+.progress-custom {
+    height: 8px;
+    border-radius: 10px;
+    background: #ecf0f1;
+    overflow: hidden;
+}
+
+.progress-custom-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--secondary-color), var(--accent-color));
+    border-radius: 10px;
+    transition: width 0.3s ease;
+}
+
+/* Timeline */
+.timeline {
+    position: relative;
+    padding: 20px 0;
+}
+
+.timeline-item {
+    margin-bottom: 30px;
+    position: relative;
+    padding-left: 40px;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 20px;
+    height: 20px;
+    background: white;
+    border: 3px solid var(--secondary-color);
+    border-radius: 50%;
+    z-index: 1;
+}
+
+.timeline-item::after {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 20px;
+    width: 4px;
+    height: 30px;
+    background: #ecf0f1;
+}
+
+.timeline-item:last-child::after {
+    display: none;
+}
+
+.timeline-item.completed::before {
+    background: var(--success-color);
+    border-color: var(--success-color);
+}
+
+.timeline-item.in-progress::before {
+    background: var(--secondary-color);
+    border-color: var(--secondary-color);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(52, 152, 219, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(52, 152, 219, 0);
+    }
+}
+
+/* ===== FORMULAIRES ===== */
+.form-control-custom {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 12px 15px;
+    font-size: 14px;
+    transition: var(--transition);
+}
+
+.form-control-custom:focus {
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+    outline: none;
+}
+
+/* ===== ALERTES ===== */
+.alert-custom {
+    border: none;
+    border-radius: 10px;
+    padding: 15px 20px;
+    margin-bottom: 20px;
+    animation: slideUp 0.3s ease;
+}
+
+.alert-custom.success {
+    background: #d4edda;
+    color: #155724;
+    border-left: 4px solid var(--success-color);
+}
+
+.alert-custom.danger {
+    background: #f8d7da;
+    color: #721c24;
+    border-left: 4px solid var(--accent-color);
+}
+
+.alert-custom.warning {
+    background: #fff3cd;
+    color: #856404;
+    border-left: 4px solid var(--warning-color);
+}
+
+.alert-custom.info {
+    background: #d1ecf1;
+    color: #0c5460;
+    border-left: 4px solid var(--secondary-color);
+}
+
+/* ===== TABLES ===== */
+.table-custom {
+    border-collapse: collapse;
+}
+
+.table-custom thead {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+}
+
+.table-custom thead th {
+    padding: 15px;
+    font-weight: 600;
+    border: none;
+}
+
+.table-custom tbody td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #ecf0f1;
+}
+
+.table-custom tbody tr:hover {
+    background: #f5f6fa;
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+@media (max-width: 768px) {
+    .sidebar {
+        position: relative;
+        width: 100%;
+        height: auto;
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+
+    .main-content {
+        margin-left: 0;
+        padding: 15px;
+    }
+
+    .card-hover {
+        margin-bottom: 15px;
+    }
+}
+
+@media (max-width: 576px) {
+    .btn-custom {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .badge-custom {
+        display: block;
+        text-align: center;
+        margin: 5px 0;
+    }
+
+    .timeline-item {
+        padding-left: 25px;
+    }
+
+    .timeline-item::before {
+        width: 15px;
+        height: 15px;
+    }
+
+    .timeline-item::after {
+        left: 5px;
+    }
+}
+
+/* ===== UTILITAIRES ===== */
+.text-muted-custom {
+    color: var(--text-light);
+}
+
+.text-primary-custom {
+    color: var(--secondary-color);
+}
+
+.text-success-custom {
+    color: var(--success-color);
+}
+
+.text-danger-custom {
+    color: var(--accent-color);
+}
+
+.text-warning-custom {
+    color: var(--warning-color);
+}
+
+/* Ombres */
+.shadow-sm-custom {
+    box-shadow: var(--shadow-sm);
+}
+
+.shadow-md-custom {
+    box-shadow: var(--shadow-md);
+}
+
+.shadow-lg-custom {
+    box-shadow: var(--shadow-lg);
+}
+
+/* Espaces */
+.gap-sm {
+    gap: 10px;
+}
+
+.gap-md {
+    gap: 20px;
+}
+
+.gap-lg {
+    gap: 30px;
+}

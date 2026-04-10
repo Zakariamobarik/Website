@@ -1,32 +1,49 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="{% url 'home' %}">Django CRM</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        
-        {% if user.is_authenticated %}
-        <li class="nav-item">
-          <a class="nav-link" href="#">Add Record</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'logout' %}">Logout</a>
-        </li>
-
-        {% else %}
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'register' %}">Register</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'home' %}">Login</a>
-        </li>        
-        {% endif %}
-        
-        
-      </ul>
-      
+<!-- SIDEBAR NAVIGATION -->
+<nav class="sidebar">
+    <!-- Logo et Titre -->
+    <div class="sidebar-header">
+        <div class="logo">
+            <i class="fas fa-industry"></i>
+        </div>
+        <h3>DCRM PRO</h3>
     </div>
-  </div>
+
+    <!-- Profil Utilisateur -->
+    <div class="user-profile">
+        <!-- Avatar avec initiales de l'utilisateur -->
+        <div class="user-avatar">
+            <i class="fas fa-user-circle"></i>
+        </div>
+        <!-- Nom et rôle de l'utilisateur -->
+        <h6>{{ user.first_name|default:user.username }}</h6>
+        <p>Opérateur Production</p>
+    </div>
+
+    <!-- Menu Principal -->
+    <ul class="sidebar-menu">
+        <li>
+            <a href="{% url 'dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                <i class="fas fa-chart-line"></i>
+                <span>Dashboard</span>
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'pointage' %}" class="{% if request.resolver_match.url_name == 'pointage' %}active{% endif %}">
+                <i class="fas fa-barcode"></i>
+                <span>Pointage</span>
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'home' %}" class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+                <i class="fas fa-home"></i>
+                <span>Accueil</span>
+            </a>
+        </li>
+    </ul>
+
+    <!-- Bouton Déconnexion -->
+    <a href="{% url 'logout' %}" class="logout-btn">
+        <i class="fas fa-sign-out-alt"></i>
+        <span>Déconnexion</span>
+    </a>
 </nav>

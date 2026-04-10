@@ -1,0 +1,186 @@
+<!-- filepath: website/templates/of/of_detail.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}OF {{ of.numero }} - Détails{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <!-- En-tête -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="display-6">
+                <i class="fas fa-file-alt"></i> {{ of.numero }}
+            </h1>
+            <p class="text-muted">{{ of.produit }} - {{ of.quantite }} pcs</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{% url 'of_list' %}" class="btn btn-secondary btn-lg">
+                <i class="fas fa-arrow-left"></i> Retour
+            </a>
+        </div>
+    </div>
+
+    <!-- 📊 Stats rapides -->
+    <div class="row mb-4">
+        <div class="col-lg-3">
+            <div class="card bg-light border-0">
+                <div class="card-body text-center">
+                    <h3 class="mb-0">{{ of.avancement }}%</h3>
+                    <p class="text-muted mb-0">Avancement</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3">
+            <div class="card bg-light border-0">
+                <div class="card-body text-center">
+                    <h3 class="mb-0">{{ operations.count }}</h3>
+                    <p class="text-muted mb-0">Opérations</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3">
+            <div class="card bg-light border-0">
+                <div class="card-body text-center">
+                    <h3 class="mb-0">
+                        {% if of.premiere_entree %}
+                            {{ of.premiere_entree|date:"H:i" }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </h3>
+                    <p class="text-muted mb-0">Début</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3">
+            <div class="card bg-light border-0">
+                <div class="card-body text-center">
+                    <h3 class="mb-0">
+                        {% if of.temps_total_reel %}
+                            {{ of.temps_total_reel }} min
+                        {% else %}
+                            -
+                        {% endif %}
+                    </h3>
+                    <p class="text-muted mb-0">Durée totale</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🔥 TABLEAU DES OPÉRATIONS -->
+    <div class="row">
+        <div class="col-lg-12">
+            <h3 class="mb-4">
+                <i class="fas fa-stream"></i> Timeline des Postes
+            </h3>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width: 5%">#</th>
+                                    <th style="width: 30%">
+                                        <i class="fas fa-cogs"></i> Opération
+                                    </th>
+                                    <th style="width: 20%">
+                                        <i class="fas fa-arrow-right"></i> Date ENTRÉE
+                                    </th>
+                                    <th style="width: 20%">
+                                        <i class="fas fa-arrow-left"></i> Date SORTIE
+                                    </th>
+                                    <th style="width: 15%">
+                                        <i class="fas fa-clock"></i> Temps
+                                    </th>
+                                    <th style="width: 10%">Statut</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for operation in operations %}
+                                <tr class="{% if operation.statut == 'termine' %}table-success{% elif operation.statut == 'en_cours' %}table-info{% endif %}">
+                                    <!-- Numéro opération -->
+                                    <td>
+                                        <span class="badge bg-secondary">
+                                            {{ operation.gamme_operation.ordre }}
+                                        </span>
+                                    </td>
+
+                                    <!-- Nom opération -->
+                                    <td>
+                                        <strong>{{ operation.gamme_operation.nom }}</strong>
+                                    </td>
+
+                                    <!-- Date ENTRÉE (saisie ou vide) -->
+                                    <td>
+                                        {% if operation.date_entree %}
+                                            <span class="text-success fw-bold">
+                                                📥 {{ operation.date_entree|date:"d/m H:i" }}
+                                            </span>
+                                        {% else %}
+                                            <!-- 🔥 BOUTON POUR SAISIR L'ENTRÉE -->
+                                            <a href="{% url 'saisir_entree_operation' operation.id %}" 
+                                               class="btn btn-sm btn-primary btn-outline">
+                                                <i class="fas fa-plus"></i> Saisir
+                                            </a>
+                                        {% endif %}
+                                    </td>
+
+                                    <!-- Date SORTIE (calculée auto) -->
+                                    <td>
+                                        {% if operation.date_sortie %}
+                                            <span class="text-primary fw-bold">
+                                                📤 {{ operation.date_sortie|date:"d/m H:i" }}
+                                            </span>
+                                            {% if operation.statut == 'termine' %}
+                                                <span class="badge bg-success ms-2">✅</span>
+                                            {% endif %}
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+
+                                    <!-- Temps alloué -->
+                                    <td>
+                                        <span class="badge bg-warning">
+                                            {{ operation.gamme_operation.temps_alloue }} min
+                                        </span>
+                                    </td>
+
+                                    <!-- Statut (AUTOMATIQUE) -->
+                                    <td>
+                                        {% if operation.statut == 'en_attente' %}
+                                            <span class="badge bg-secondary">⏱️ Attente</span>
+                                        {% elif operation.statut == 'en_cours' %}
+                                            <span class="badge bg-primary">⏳ Cours</span>
+                                        {% elif operation.statut == 'termine' %}
+                                            <span class="badge bg-success">✅ Fin</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">{{ operation.statut }}</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Messages -->
+    {% if messages %}
+        <div class="mt-4">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Saisir entrée - {{ suivi.operation.nom }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <!-- En-tête -->
+            <div class="mb-4">
+                <h2>
+                    <i class="fas fa-arrow-right"></i> 
+                    Saisir l'entrée au poste
+                </h2>
+                <p class="text-muted">OF: <strong>{{ of.numero }}</strong></p>
+            </div>
+
+            <!-- Info de l'opération -->
+            <div class="card mb-4 bg-light border-0">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-cogs"></i> {{ suivi.operation.nom }}
+                    </h5>
+                    <p class="mb-2">
+                        <strong>Produit:</strong> {{ of.produit }}
+                    </p>
+                    <p class="mb-0">
+                        <strong>⏱️ Temps alloué:</strong> 
+                        <span class="badge bg-info">
+                            {{ suivi.operation.temps_alloue }} min
+                        </span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Formulaire -->
+            <div class="card border-0 shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Saisir la date/heure d'entrée</h5>
+                </div>
+                <div class="card-body p-4">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="POST" novalidate>
+                        {% csrf_token %}
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-calendar-alt"></i> 
+                                Date et heure d'entrée
+                            </label>
+                            {{ form.date_entree }}
+                            {% if form.date_entree.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.date_entree.errors.0 }}
+                                </div>
+                            {% endif %}
+                            <small class="text-muted d-block mt-2">
+                                Format: JJ/MM/YYYY HH:MM
+                            </small>
+                        </div>
+
+                        <!-- Calcul automatique (affichage) -->
+                        <div class="alert alert-info">
+                            <strong>⏱️ Calcul automatique:</strong><br>
+                            Sortie = Entrée + {{ suivi.operation.temps_alloue }} min
+                            <p class="mt-2 mb-0">
+                                <em>Exemple: Si entrée = 09:00, sortie = 09:{{ suivi.operation.temps_alloue }}</em>
+                            </p>
+                        </div>
+
+                        <!-- Boutons -->
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-success btn-lg flex-grow-1">
+                                <i class="fas fa-check"></i> Confirmer l'entrée
+                            </button>
+                            <a href="{% url 'detail_of' of.numero %}" 
+                               class="btn btn-secondary btn-lg">
+                                <i class="fas fa-times"></i> Annuler
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Info supplémentaire -->
+            <div class="alert alert-warning mt-4" role="alert">
+                <h6 class="alert-heading">
+                    <i class="fas fa-lightbulb"></i> Conseil
+                </h6>
+                <small>
+                    Saisissez l'heure réelle d'ENTRÉE du lot au poste.
+                    La sortie sera calculée automatiquement en ajoutant le temps alloué.
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

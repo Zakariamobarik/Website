@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Déclarer un Aléa - Suivi Production{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- En-tête -->
+            <h1 class="display-5 mb-1">
+                <i class="fas fa-exclamation-triangle"></i> Déclarer un Aléa
+            </h1>
+            <p class="text-muted mb-4">
+                Enregistrez un problème rencontré lors de cette opération
+            </p>
+
+            <!-- Infos sur l'opération -->
+            <div class="alert alert-info mb-4">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p class="mb-1">
+                            <strong>OF:</strong> 
+                            <span class="badge bg-primary">{{ operation.of.numero }}</span>
+                        </p>
+                        <p class="mb-0">
+                            <strong>Produit:</strong> {{ operation.of.produit }}
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="mb-1">
+                            <strong>Opération:</strong> {{ operation.gamme_operation.nom }}
+                        </p>
+                        <p class="mb-0">
+                            <strong>Opérateur:</strong> 
+                            {% if operation.operateur %}
+                                {{ operation.operateur.prenom }} {{ operation.operateur.nom }}
+                            {% else %}
+                                <span class="text-muted">Non assigné</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Messages -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <!-- Formulaire -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Détails de l'aléa</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST" novalidate>
+                        {% csrf_token %}
+
+                        <!-- Type d'aléa -->
+                        <div class="mb-4">
+                            <label class="form-label">
+                                <i class="fas fa-tag"></i> Type d'aléa <span class="text-danger">*</span>
+                            </label>
+                            <div>
+                                {% for choice in form.type_alea %}
+                                    <div class="form-check mb-2">
+                                        {{ choice.tag }}
+                                        <label class="form-check-label">
+                                            {{ choice.choice_label }}
+                                        </label>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            {% if form.type_alea.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.type_alea.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Description -->
+                        <div class="mb-4">
+                            <label class="form-label">
+                                <i class="fas fa-file-alt"></i> Description <span class="text-danger">*</span>
+                            </label>
+                            {{ form.description }}
+                            {% if form.description.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.description.errors.0 }}
+                                </div>
+                            {% endif %}
+                            <small class="text-muted d-block mt-2">
+                                Décrivez précisément le problème rencontré
+                            </small>
+                        </div>
+
+                        <!-- Durée -->
+                        <div class="mb-4">
+                            <label class="form-label">
+                                <i class="fas fa-clock"></i> Durée (minutes) <span class="text-danger">*</span>
+                            </label>
+                            {{ form.duree }}
+                            {% if form.duree.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.duree.errors.0 }}
+                                </div>
+                            {% endif %}
+                            <small class="text-muted d-block mt-2">
+                                Temps d'arrêt occasionné par cet aléa
+                            </small>
+                        </div>
+
+                        <!-- Boutons -->
+                        <div class="d-flex gap-2 mt-5">
+                            <button type="submit" class="btn btn-warning flex-grow-1">
+                                <i class="fas fa-save"></i> Enregistrer l'aléa
+                            </button>
+                            <a href="{% url 'detail_of' operation.of.numero %}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Annuler
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Exemple -->
+            <div class="alert alert-light mt-4 border">
+                <h6 class="mb-3">
+                    <i class="fas fa-lightbulb"></i> Exemples d'aléas
+                </h6>
+                <ul class="mb-0 small">
+                    <li><strong>Panne:</strong> Machine arrêtée pendant 15 minutes</li>
+                    <li><strong>Qualité:</strong> Lot rejeté, contrôle qualité échoué</li>
+                    <li><strong>Déplacement:</strong> Temps inutile pour trouver les pièces (10 min)</li>
+                    <li><strong>Attente:</strong> En attente du lot suivant (20 min)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-label {
+        font-weight: 600;
+        color: var(--text-dark);
+        margin-bottom: 10px;
+    }
+
+    .form-control {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 10px 15px;
+        font-size: 14px;
+    }
+
+    .form-control:focus {
+        border-color: var(--secondary-color);
+        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+    }
+
+    .form-check-input {
+        margin-top: 3px;
+    }
+</style>
+{% endblock %}

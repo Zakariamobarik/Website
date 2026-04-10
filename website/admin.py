@@ -1,22 +1,21 @@
 from django.contrib import admin
 from .models import Operateur, GammeOperation, OrdreFabrication, OperationOF, Alea
 
-# Permet de gérer tout depuis /admin sans coder d'interface au début
+# ===== ENREGISTREMENT SIMPLE DES MODÈLES =====
+# Cela permet de gérer les données depuis l'interface admin Django
+# http://localhost:8000/admin/
 
-@admin.register(OrdreFabrication)
-class OFAdmin(admin.ModelAdmin):
-    list_display  = ['numero', 'produit', 'statut', 'date_due', 'avancement']
-    list_filter   = ['statut']
-    search_fields = ['numero', 'produit']
-
-@admin.register(OperationOF)
-class OperationOFAdmin(admin.ModelAdmin):
-    list_display = ['of', 'gamme_operation', 'statut', 'heure_debut', 'heure_fin', 'operateur']
-    list_filter  = ['statut']
-
-@admin.register(Alea)
-class AleaAdmin(admin.ModelAdmin):
-    list_display = ['operation', 'type_alea', 'duree', 'declare_par', 'cree_le']
-
+# Enregistrer Operateur
 admin.site.register(Operateur)
+
+# Enregistrer GammeOperation
 admin.site.register(GammeOperation)
+
+# Enregistrer OrdreFabrication
+admin.site.register(OrdreFabrication)
+
+# Enregistrer OperationOF
+admin.site.register(OperationOF)
+
+# Enregistrer Alea
+admin.site.register(Alea)

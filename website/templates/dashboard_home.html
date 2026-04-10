@@ -1,0 +1,173 @@
+{% extends 'base.html' %}
+
+{% block title %}Accueil - Suivi Production{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- En-tête avec message de bienvenue -->
+    <div class="row mb-5">
+        <div class="col-md-8">
+            <h1 class="display-4">
+                <i class="fas fa-home" style="color: #3498db;"></i> Bienvenue !
+            </h1>
+            <p class="lead text-muted">
+                Suivi en temps réel de votre production
+            </p>
+        </div>
+        <div class="col-md-4 text-end">
+            <div style="background: linear-gradient(135deg, #3498db 0%, #2c3e50 100%); 
+                        color: white; padding: 20px; border-radius: 10px;">
+                <h6 class="mb-2">👤 Utilisateur</h6>
+                <p class="mb-0"><strong>{{ user.first_name|default:user.username }}</strong></p>
+                <p class="mb-0 small">{{ user.email }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- KPI Cards - Résumé rapide -->
+    <div class="row mb-5">
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm" style="border-left: 4px solid #3498db;">
+                <div class="card-body text-center">
+                    <i class="fas fa-spinner" style="font-size: 2.5rem; color: #3498db;"></i>
+                    <h3 class="mt-3 mb-1">{{ total_en_cours }}</h3>
+                    <p class="text-muted mb-0">OF en cours</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm" style="border-left: 4px solid #e74c3c;">
+                <div class="card-body text-center">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 2.5rem; color: #e74c3c;"></i>
+                    <h3 class="mt-3 mb-1">{{ total_en_retard }}</h3>
+                    <p class="text-muted mb-0">OF en retard</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm" style="border-left: 4px solid #27ae60;">
+                <div class="card-body text-center">
+                    <i class="fas fa-check-circle" style="font-size: 2.5rem; color: #27ae60;"></i>
+                    <h3 class="mt-3 mb-1">{{ total_termines }}</h3>
+                    <p class="text-muted mb-0">OF terminés</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm" style="border-left: 4px solid #f39c12;">
+                <div class="card-body text-center">
+                    <i class="fas fa-users" style="font-size: 2.5rem; color: #f39c12;"></i>
+                    <h3 class="mt-3 mb-1">{{ total_operateurs }}</h3>
+                    <p class="text-muted mb-0">Opérateurs</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions principales -->
+    <div class="row">
+        <div class="col-lg-8 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header" style="background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%); color: white;">
+                    <h5 class="mb-0"><i class="fas fa-bolt"></i> Actions rapides</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <a href="{% url 'pointage' %}" class="card text-decoration-none border-0 shadow-sm" 
+                               style="transition: all 0.3s;">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-barcode" style="font-size: 3rem; color: #3498db;"></i>
+                                    <h6 class="mt-3 mb-1">Pointage</h6>
+                                    <p class="text-muted small mb-0">Scanner une opération</p>
+                                </div>
+                            </a>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <a href="{% url 'dashboard' %}" class="card text-decoration-none border-0 shadow-sm" 
+                               style="transition: all 0.3s;">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-chart-bar" style="font-size: 3rem; color: #27ae60;"></i>
+                                    <h6 class="mt-3 mb-1">Dashboard</h6>
+                                    <p class="text-muted small mb-0">Voir tous les OF</p>
+                                </div>
+                            </a>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <a href="{% url 'gammes_list' %}" class="card text-decoration-none border-0 shadow-sm" 
+                               style="transition: all 0.3s;">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-cogs" style="font-size: 3rem; color: #f39c12;"></i>
+                                    <h6 class="mt-3 mb-1">Gammes</h6>
+                                    <p class="text-muted small mb-0">Gérer les opérations</p>
+                                </div>
+                            </a>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <a href="{% url 'operateur_list' %}" class="card text-decoration-none border-0 shadow-sm" 
+                               style="transition: all 0.3s;">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-users" style="font-size: 3rem; color: #e74c3c;"></i>
+                                    <h6 class="mt-3 mb-1">Opérateurs</h6>
+                                    <p class="text-muted small mb-0">Gérer l'équipe</p>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Infos utiles -->
+        <div class="col-lg-4 mb-4">
+            <div class="card border-0 shadow-sm mb-3">
+                <div class="card-header" style="background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%); color: white;">
+                    <h5 class="mb-0"><i class="fas fa-info-circle"></i> À propos</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-3">
+                        <strong>DCRM Pro</strong> est une solution complète pour le suivi en temps réel 
+                        de votre production.
+                    </p>
+                    <hr>
+                    <h6>Fonctionnalités :</h6>
+                    <ul class="small">
+                        <li>✅ Pointage par code-barres</li>
+                        <li>✅ Dashboard temps réel</li>
+                        <li>✅ Gestion des aléas</li>
+                        <li>✅ Timeline des opérations</li>
+                        <li>✅ Historique complet</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm" style="border-left: 4px solid #f39c12;">
+                <div class="card-body">
+                    <h6><i class="fas fa-lightbulb"></i> Conseil</h6>
+                    <small class="text-muted">
+                        Utilisez le menu de gauche pour naviguer entre les différentes sections 
+                        de l'application.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        transition: all 0.3s ease;
+    }
+    
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important;
+    }
+</style>
+{% endblock %}

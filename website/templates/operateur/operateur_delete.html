@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Confirmer la suppression - Suivi Production{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Alerte de danger -->
+    <div class="row">
+        <div class="col-lg-6 mx-auto">
+            <div class="card border-danger border-3 shadow-sm">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-exclamation-triangle"></i> Confirmer la suppression
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    <!-- Message de confirmation -->
+                    <div class="alert alert-warning" role="alert">
+                        <i class="fas fa-warning"></i> 
+                        <strong>Attention !</strong> Cette action est irréversible.
+                    </div>
+
+                    <!-- Infos sur l'opérateur à supprimer -->
+                    <div class="bg-light p-3 rounded mb-4">
+                        <h5>Vous êtes sur le point de supprimer :</h5>
+                        <p class="mb-1">
+                            <strong>Nom :</strong> <span class="text-danger">{{ operateur.nom }}</span>
+                        </p>
+                        <p class="mb-1">
+                            <strong>Prénom :</strong> <span class="text-danger">{{ operateur.prenom }}</span>
+                        </p>
+                        <p class="mb-1">
+                            <strong>Code Badge :</strong> <span class="badge bg-info">{{ operateur.code_badge }}</span>
+                        </p>
+                        <p class="mb-0">
+                            <strong>Poste :</strong> 
+                            {% if operateur.poste %}
+                                {{ operateur.poste }}
+                            {% else %}
+                                <span class="text-muted">Non défini</span>
+                            {% endif %}
+                        </p>
+                    </div>
+
+                    <!-- Formulaire de confirmation -->
+                    <form method="POST">
+                        {% csrf_token %}
+                        <p class="text-muted mb-4">
+                            Cet opérateur sera définitivement supprimé de la base de données.
+                        </p>
+
+                        <div class="d-flex gap-2">
+                            <!-- Bouton Confirmer la suppression -->
+                            <button type="submit" class="btn btn-danger btn-lg">
+                                <i class="fas fa-trash"></i> Supprimer définitivement
+                            </button>
+
+                            <!-- Bouton Annuler -->
+                            <a href="{% url 'operateurs_list' %}" class="btn btn-secondary btn-lg">
+                                <i class="fas fa-times"></i> Annuler
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

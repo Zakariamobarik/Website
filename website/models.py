@@ -1,12 +1,11 @@
 from django.db import models
 from django.utils import timezone
+from datetime import timedelta
 
 # ─── Opérateur ───────────────────────────────────────────────
-# Représente un opérateur de l'atelier identifié par son badge
 class Operateur(models.Model):
     nom        = models.CharField(max_length=100)
     prenom     = models.CharField(max_length=100)
-    # code_badge = ce que lit le scanner code-barres
     code_badge = models.CharField(max_length=50, unique=True)
     poste      = models.CharField(max_length=100, blank=True)
 
@@ -15,61 +14,80 @@ class Operateur(models.Model):
 
 
 # ─── Gamme opératoire ─────────────────────────────────────────
-# Définit une opération "type" avec son temps alloué standard
-# Ex : "Assemblage structure" = 2,01h → 121 minutes
 class GammeOperation(models.Model):
     nom           = models.CharField(max_length=200)
-    # temps_alloue en minutes (plus pratique que les heures décimales)
-    temps_alloue  = models.PositiveIntegerField(help_text="Durée standard en minutes")
+    temps_alloue  = models.DecimalField(max_digits=5, decimal_places=2, help_text="Durée standard en minutes")
     ordre         = models.PositiveSmallIntegerField(help_text="Position dans la gamme")
 
     class Meta:
-        ordering = ['ordre']  # toujours triées dans l'ordre de la gamme
+        ordering = ['ordre']
 
     def __str__(self):
         return f"{self.ordre}. {self.nom} ({self.temps_alloue} min)"
 
 
-# ─── Ordre de Fabrication ─────────────────────────────────────
-# Un OF = un strapontin (ou un lot) à produire
+# ─── Ordre de Fabrication (SIMPLIFIÉ) ──────────────────────────────
 class OrdreFabrication(models.Model):
+    """
+    SIMPLIFIÉ:
+    - Pas de date_lancement (on sait pas quand ça commence)
+    - Pas de date_due (on sait pas la date de livraison à l'avance)
+    - Pas de statut (calculé automatiquement)
+    - Pas de gamme ManyToMany (les OperationOF font le lien)
+    """
 
-    STATUT_CHOICES = [
-        ('en_attente',  'En attente'),
-        ('en_cours',    'En cours'),
-        ('en_retard',   'En retard'),
-        ('termine',     'Terminé'),
-        ('bloque',      'Bloqué'),
-    ]
-
-    numero          = models.CharField(max_length=50, unique=True)
-    produit         = models.CharField(max_length=200)  # ex : "Strapontin modèle X"
-    quantite        = models.PositiveIntegerField(default=1)
-    date_lancement  = models.DateTimeField(default=timezone.now)
-    date_due        = models.DateTimeField(help_text="Date de livraison prévue")
-    statut          = models.CharField(max_length=20, choices=STATUT_CHOICES, default='en_attente')
-    # gamme = la liste des opérations prévues pour cet OF
-    gamme           = models.ManyToManyField(GammeOperation, through='OperationOF')
+    numero   = models.CharField(max_length=50, unique=True)
+    produit  = models.CharField(max_length=200)
+    quantite = models.PositiveIntegerField(default=1)
 
     def __str__(self):
         return f"OF {self.numero} — {self.produit}"
 
-    def est_en_retard(self):
-        """Retourne True si l'OF n'est pas terminé et dépasse sa date due"""
-        return self.statut != 'termine' and timezone.now() > self.date_due
-
+    # ✅ MÉTHODE CORRIGÉE
+    @property
     def avancement(self):
-        """Calcule le % d'avancement : nb opérations pointées / nb total"""
-        total   = self.operationof_set.count()
-        terminees = self.operationof_set.filter(statut='termine').count()
+        """
+        Calcule le % d'avancement en comptant les opérations terminées
+        """
+        # Récupère toutes les opérations de cet OF
+        operations = self.operationof_set.all()
+        total = operations.count()
+        
         if total == 0:
             return 0
+        
+        # Compte les opérations terminées (statut='termine')
+        terminees = 0
+        for op in operations:
+            # ✅ On lit la @property statut, on ne la filtre pas
+            if op.statut == 'termine':
+                terminees += 1
+        
+        # Retourne le pourcentage
         return round((terminees / total) * 100)
 
+    @property
+    def premiere_entree(self):
+        """Date d'entrée de la première opération"""
+        first = self.operationof_set.order_by('gamme_operation__ordre').first()
+        return first.date_entree if first else None
 
-# ─── Opération d'un OF ────────────────────────────────────────
-# Liaison entre un OF et une GammeOperation
-# C'est ici qu'on stocke l'état RÉEL de chaque opération
+    @property
+    def derniere_sortie(self):
+        """Date de sortie de la dernière opération"""
+        last = self.operationof_set.order_by('gamme_operation__ordre').last()
+        return last.date_sortie if last else None
+
+    @property
+    def temps_total_reel(self):
+        """Calcule le temps TOTAL réel de production"""
+        if self.premiere_entree and self.derniere_sortie:
+            delta = self.derniere_sortie - self.premiere_entree
+            return round(delta.total_seconds() / 60)
+        return None
+
+
+# ─── -----------------------------Opération d'un OF --------------------------------------------------------------------------
 class OperationOF(models.Model):
 
     STATUT_CHOICES = [
@@ -81,35 +99,69 @@ class OperationOF(models.Model):
 
     of              = models.ForeignKey(OrdreFabrication, on_delete=models.CASCADE)
     gamme_operation = models.ForeignKey(GammeOperation, on_delete=models.CASCADE)
-    statut          = models.CharField(max_length=20, choices=STATUT_CHOICES, default='en_attente')
-    # heure_debut et heure_fin = remplies automatiquement par le scan
-    heure_debut     = models.DateTimeField(null=True, blank=True)
-    heure_fin       = models.DateTimeField(null=True, blank=True)
+    
+    date_entree     = models.DateTimeField(null=True, blank=True, help_text="Date/heure d'ENTRÉE (saisie manuelle)")
     operateur       = models.ForeignKey(Operateur, null=True, blank=True, on_delete=models.SET_NULL)
 
     class Meta:
         ordering = ['gamme_operation__ordre']
-
-    def temps_reel_minutes(self):
-        """Calcule la durée réelle en minutes si l'opération est terminée"""
-        if self.heure_debut and self.heure_fin:
-            delta = self.heure_fin - self.heure_debut
-            return round(delta.total_seconds() / 60)
-        return None
-
-    def est_en_retard(self):
-        """Compare le temps réel au temps alloué"""
-        tr = self.temps_reel_minutes()
-        if tr and tr > self.gamme_operation.temps_alloue:
-            return True
-        return False
+        unique_together = ('of', 'gamme_operation')
 
     def __str__(self):
         return f"{self.of.numero} / {self.gamme_operation.nom}"
 
+    # 🔑 PROPRIÉTÉ 1: Date de sortie (CALCULÉE AUTO)
+    @property
+    def date_sortie(self):
+        """date_sortie = date_entree + temps_alloue"""
+        if not self.date_entree:
+            return None
+        temps_minutes = float(self.gamme_operation.temps_alloue)
+        return self.date_entree + timedelta(minutes=temps_minutes)
 
-# ─── Aléa (Muda / Incident) ──────────────────────────────────
-# Enregistre tout ce qui perturbe le flux : attente, panne, déplacement inutile...
+    # 🔑 PROPRIÉTÉ 2: STATUT AUTOMATIQUE !!!
+    @property
+    def statut(self):
+        """
+        🔥 LE STATUT EST CALCULÉ AUTOMATIQUEMENT:
+        
+        - Si date_entree n'existe pas → 'en_attente'
+        - Si l'heure actuelle < date_sortie → 'en_cours'
+        - Si l'heure actuelle >= date_sortie → 'termine' ✅
+        """
+        from django.utils import timezone
+        
+        # Pas encore commencée
+        if not self.date_entree:
+            return 'en_attente'
+        
+        # Déjà commencée, on compare avec maintenant
+        maintenant = timezone.now()
+        
+        # Si on a dépassé la date de sortie → TERMINÉE!
+        if self.date_sortie and maintenant >= self.date_sortie:
+            return 'termine'
+        
+        # Sinon, c'est en cours
+        return 'en_cours'
+
+    # 🔑 PROPRIÉTÉ 3: Temps réel en minutes
+    @property
+    def temps_reel_minutes(self):
+        """Durée réelle"""
+        if self.date_entree and self.date_sortie:
+            delta = self.date_sortie - self.date_entree
+            return round(delta.total_seconds() / 60)
+        return None
+
+    # 🔑 PROPRIÉTÉ 4: Est terminée ?
+    @property
+    def est_terminee(self):
+        """Retourne True si l'opération est terminée"""
+        return self.statut == 'termine'
+
+
+# ─── Aléa ─────────────────────────────────────────────────────
 class Alea(models.Model):
 
     TYPE_CHOICES = [
@@ -124,7 +176,6 @@ class Alea(models.Model):
     operation   = models.ForeignKey(OperationOF, on_delete=models.CASCADE)
     type_alea   = models.CharField(max_length=30, choices=TYPE_CHOICES)
     description = models.TextField(blank=True)
-    # durée de l'aléa en minutes → permet de calculer le temps perdu total
     duree       = models.PositiveIntegerField(help_text="Durée en minutes", default=0)
     declare_par = models.ForeignKey(Operateur, null=True, blank=True, on_delete=models.SET_NULL)
     cree_le     = models.DateTimeField(auto_now_add=True)

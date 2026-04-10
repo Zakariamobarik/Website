@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ titre }} - Suivi Production{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- En-tête -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="display-6">
+                <i class="fas fa-user-plus"></i> {{ titre }}
+            </h1>
+        </div>
+    </div>
+
+    <!-- Formulaire -->
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">{{ titre }}</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST" novalidate>
+                        {% csrf_token %}
+                        
+                        <!-- Champ Nom -->
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <i class="fas fa-user"></i> Nom
+                            </label>
+                            {% if form.nom.errors %}
+                                <input type="text" name="nom" class="form-control is-invalid" 
+                                       value="{{ form.nom.value|default:'' }}" required>
+                                <div class="invalid-feedback">
+                                    {{ form.nom.errors.0 }}
+                                </div>
+                            {% else %}
+                                <input type="text" name="nom" class="form-control" 
+                                       placeholder="Ex: Dupont" 
+                                       value="{{ form.nom.value|default:'' }}" required>
+                            {% endif %}
+                        </div>
+
+                        <!-- Champ Prénom -->
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <i class="fas fa-user"></i> Prénom
+                            </label>
+                            {% if form.prenom.errors %}
+                                <input type="text" name="prenom" class="form-control is-invalid" 
+                                       value="{{ form.prenom.value|default:'' }}" required>
+                                <div class="invalid-feedback">
+                                    {{ form.prenom.errors.0 }}
+                                </div>
+                            {% else %}
+                                <input type="text" name="prenom" class="form-control" 
+                                       placeholder="Ex: Jean" 
+                                       value="{{ form.prenom.value|default:'' }}" required>
+                            {% endif %}
+                        </div>
+
+                        <!-- Champ Code Badge -->
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <i class="fas fa-barcode"></i> Code Badge
+                            </label>
+                            {% if form.code_badge.errors %}
+                                <input type="text" name="code_badge" class="form-control is-invalid" 
+                                       value="{{ form.code_badge.value|default:'' }}" required>
+                                <div class="invalid-feedback">
+                                    {{ form.code_badge.errors.0 }}
+                                </div>
+                            {% else %}
+                                <input type="text" name="code_badge" class="form-control" 
+                                       placeholder="Ex: A001 (doit être unique)" 
+                                       value="{{ form.code_badge.value|default:'' }}" required>
+                            {% endif %}
+                            <small class="text-muted">Ce code doit être unique (utilisé pour le scan)</small>
+                        </div>
+
+                        <!-- Champ Poste -->
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <i class="fas fa-briefcase"></i> Poste
+                            </label>
+                            {% if form.poste.errors %}
+                                <input type="text" name="poste" class="form-control is-invalid" 
+                                       value="{{ form.poste.value|default:'' }}">
+                                <div class="invalid-feedback">
+                                    {{ form.poste.errors.0 }}
+                                </div>
+                            {% else %}
+                                <input type="text" name="poste" class="form-control" 
+                                       placeholder="Ex: Assemblage (optionnel)" 
+                                       value="{{ form.poste.value|default:'' }}">
+                            {% endif %}
+                            <small class="text-muted">Optionnel - Département ou fonction</small>
+                        </div>
+
+                        <hr>
+
+                        <!-- Boutons d'action -->
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="fas fa-save"></i> 
+                                {% if operateur %}Mettre à jour{% else %}Ajouter{% endif %}
+                            </button>
+                            <a href="{% url 'operateur_list' %}" class="btn btn-secondary btn-lg">
+                                <i class="fas fa-times"></i> Annuler
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Aide à droite -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm bg-light">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-info-circle"></i> Aide
+                    </h5>
+                    <ul class="small">
+                        <li><strong>Nom :</strong> Nom de famille de l'opérateur</li>
+                        <li><strong>Prénom :</strong> Prénom de l'opérateur</li>
+                        <li><strong>Code Badge :</strong> Identifiant unique (IMPORTANT pour le scan)</li>
+                        <li><strong>Poste :</strong> Département ou spécialité (optionnel)</li>
+                    </ul>
+                    
+                    {% if operateur %}
+                    <hr>
+                    <p class="small text-muted">
+                        <strong>ID :</strong> {{ operateur.id }}<br>
+                        <strong>Nom complet :</strong> {{ operateur.prenom }} {{ operateur.nom }}<br>
+                        <strong>Badge :</strong> {{ operateur.code_badge }}
+                    </p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
