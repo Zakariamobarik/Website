@@ -321,6 +321,27 @@ def terminer_operation(request, operation_id):
 
 
 
+@login_required(login_url='home')
+def list_retard(request):
+    """
+    Tableau simple des retards:
+    - Lignes: Les 20 derniers OF
+    - Colonnes: Les opérations (gammes)
+    - Cellules: Le retard en minutes
+    """
+    # Les 20 derniers OF
+    ofs = OrdreFabrication.objects.all().order_by('-id')[:20]
+    
+    # Toutes les gammes (opérations) triées par ordre
+    gammes = GammeOperation.objects.all().order_by('ordre')
+    
+    context = {
+        'ofs': ofs,
+        'gammes': gammes,
+    }
+    return render(request, 'statistiques_retard/list_retard.html', context)
+
+
 
 
 
@@ -341,19 +362,7 @@ def dashboard(request):
     return render(request, 'dashboard.html', context)
 
 
-@login_required(login_url='home')
-def of_detail(request, id):
-    """Affiche le détail d'un OF avec sa timeline"""
-    of = get_object_or_404(OrdreFabrication, id=id)
-    
-    # ✅ Récupère les opérations TRIÉES par ordre
-    operations = of.operationof_set.all().order_by('gamme_operation__ordre')
-    
-    context = {
-        'of': of,
-        'operations': operations,
-    }
-    return render(request, 'of/of_detail.html', context)
+
 
 
 

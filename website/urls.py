@@ -44,8 +44,35 @@ urlpatterns = [
     # Marquer une opération comme terminée (optionnel)
     path('operation/<int:operation_id>/terminer/', views.terminer_operation, name='terminer_operation'),
     
+# ==================== Ordre de fabrication  =======================================
 
-#ajouter la timeline dans details of 
+    path('statistiques/retard/', views.list_retard, name='list_retard'),
+
+
+
+# ==================== next  =======================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

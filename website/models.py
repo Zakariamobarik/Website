@@ -86,6 +86,47 @@ class OrdreFabrication(models.Model):
             return round(delta.total_seconds() / 60)
         return None
 
+    # ✅ AJOUTER CES 3 PROPRIÉTÉS:
+    @property
+    def temps_total_theorique(self):
+        """
+        Temps THÉORIQUE = somme de tous les temps alloués
+        C'est le temps idéal sans retards
+        """
+        operations = self.operationof_set.all()
+        
+        if not operations.exists():
+            return 0
+        
+        total = 0
+        for op in operations:
+            total += float(op.gamme_operation.temps_alloue)
+        
+        return round(total)
+
+    @property
+    def heure_fin_prevue(self):
+        """
+        Heure de fin PRÉVUE = première entrée + temps théorique
+        """
+        if not self.premiere_entree:
+            return None
+        
+        temps_theo = self.temps_total_theorique
+        return self.premiere_entree + timedelta(minutes=temps_theo)
+
+    @property
+    def ecart_temps(self):
+        """
+        ÉCART = temps réel - temps théorique
+        Positif = dépassement (en retard)
+        Négatif = gain de temps (en avance)
+        """
+        if not self.temps_total_reel:
+            return None
+        
+        return self.temps_total_reel - self.temps_total_theorique
+
 
 # ─── -----------------------------Opération d'un OF --------------------------------------------------------------------------
 class OperationOF(models.Model):
@@ -159,6 +200,55 @@ class OperationOF(models.Model):
     def est_terminee(self):
         """Retourne True si l'opération est terminée"""
         return self.statut == 'termine'
+    
+    # ✅ AJOUTER: Propriété 5: retard_minutes
+    @property
+    def retard_minutes(self):
+        """Retard = date_entree(n) - date_sortie(n-1)"""
+        if not self.date_entree:
+            return None
+        
+        operation_precedente = OperationOF.objects.filter(
+            of=self.of,
+            gamme_operation__ordre__lt=self.gamme_operation.ordre
+        ).order_by('-gamme_operation__ordre').first()
+        
+        if not operation_precedente:
+            return 0
+        
+        if not operation_precedente.date_sortie:
+            return None
+        
+        delta = self.date_entree - operation_precedente.date_sortie
+        return round(delta.total_seconds() / 60)
+    
+    # ✅ GARDER: Propriété 6: retard_minutes_affichage
+    @property
+    def retard_minutes_affichage(self):
+        """Affiche le retard de l'opération suivante"""
+        operation_suivante = OperationOF.objects.filter(
+            of=self.of,
+            gamme_operation__ordre=self.gamme_operation.ordre + 1
+        ).first()
+        
+        if not operation_suivante:
+            return None
+        
+        return operation_suivante.retard_minutes
+    
+    # ✅ GARDER: Propriété 7: statut_retard
+    @property
+    def statut_retard(self):
+        """Retourne 'retard', 'avance', ou 'normal'"""
+        r = self.retard_minutes
+        if r is None:
+            return None
+        if r > 0:
+            return 'retard'
+        elif r < 0:
+            return 'avance'
+        else:
+            return 'normal'
 
 
 # ─── Aléa ─────────────────────────────────────────────────────
